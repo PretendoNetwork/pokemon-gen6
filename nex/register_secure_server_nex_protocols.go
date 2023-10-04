@@ -1,0 +1,20 @@
+package nex
+
+import (
+	"github.com/PretendoNetwork/nex-protocols-go/subscription"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
+	nex_subscription "github.com/PretendoNetwork/pokemon-gen6/nex/subscription"
+)
+
+func registerSecureServerNEXProtocols() {
+	subscriptionProtocol := subscription.NewSubscriptionProtocol(globals.SecureServer)
+
+	subscriptionProtocol.CreateMySubscriptionData(nex_subscription.CreateMySubscriptionData)
+	subscriptionProtocol.UpdateMySubscriptionData(nex_subscription.UpdateMySubscriptionData)
+	subscriptionProtocol.GetFriendSubscriptionData(nex_subscription.GetFriendSubscriptionData)
+	subscriptionProtocol.GetTargetSubscriptionData(nex_subscription.GetTargetSubscriptionData)
+	subscriptionProtocol.GetActivePlayerSubscriptionData(nex_subscription.GetActivePlayerSubscriptionData)
+	subscriptionProtocol.GetSubscriptionData(nex_subscription.GetSubscriptionData)
+	subscriptionProtocol.ReplaceTargetAndGetSubscriptionData(nex_subscription.ReplaceTargetAndGetSubscriptionData)
+	subscriptionProtocol.GetPrivacyLevels(nex_subscription.GetPrivacyLevels)
+}
