@@ -6,14 +6,17 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2/types"
 	pb "github.com/PretendoNetwork/grpc-go/account"
-	"github.com/PretendoNetwork/pokemon-gen6/database"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	"github.com/PretendoNetwork/plogger-go"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+
+	"github.com/PretendoNetwork/pokemon-gen6/database"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
 func init() {
@@ -45,6 +48,9 @@ func init() {
 	} else {
 		globals.KerberosPassword = kerberosPassword
 	}
+
+	globals.AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", globals.KerberosPassword)
+	globals.SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", globals.KerberosPassword)
 
 	if strings.TrimSpace(authenticationServerPort) == "" {
 		globals.Logger.Error("PN_POKEGEN6_AUTHENTICATION_SERVER_PORT environment variable not set")

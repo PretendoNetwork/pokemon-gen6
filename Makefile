@@ -44,17 +44,17 @@ SERVER_BUILD := $(BRANCH):$(REMOTE_PATH)@$(HASH)
 else
 # * .git folder not present, assume downloaded from zip file and just use folder name
 $(info "$(CYAN)git repository not found. Building server build string from folder name$(RESET)")
-SERVER_BUILD := $(notdir $(CURDIR))
+SERVER_BUILD := pokemon-gen6
 endif
 
 # * Final build string
 DATE_TIME    := $(shell date --iso=seconds)
 BUILD_STRING := $(SERVER_BUILD), $(DATE_TIME)
 
-all:
+default:
 ifeq ($(wildcard .env),)
 	$(warning "$(YELLOW).env file not found, environment variables may not be populated correctly$(RESET)")
 endif
 	go get -u
 	go mod tidy
-	go build -ldflags "-X 'main.serverBuildString=$(BUILD_STRING)'" -o ./build/$(notdir $(CURDIR))
+	go build -ldflags "-X 'main.serverBuildString=$(BUILD_STRING)'" -o ./build/pokemon-gen6

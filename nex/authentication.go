@@ -3,35 +3,40 @@ package nex
 import (
 	"fmt"
 	"os"
+	"strconv"
 
-	nex "github.com/PretendoNetwork/nex-go"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
 var serverBuildString string
 
 func StartAuthenticationServer() {
-	globals.AuthenticationServer = nex.NewServer()
-	globals.AuthenticationServer.SetPRUDPVersion(1)
-	globals.AuthenticationServer.SetPRUDPProtocolMinorVersion(3)
-	globals.AuthenticationServer.SetDefaultNEXVersion(&nex.NEXVersion{
-		Major: 3,
-		Minor: 3,
-		Patch: 0,
-	})
-	globals.AuthenticationServer.SetKerberosPassword(globals.KerberosPassword)
-	globals.AuthenticationServer.SetAccessKey("876138df")
+	globals.AuthenticationServer = nex.NewPRUDPServer()
 
-	globals.AuthenticationServer.On("Data", func(packet *nex.PacketV1) {
-		request := packet.RMCRequest()
+	globals.AuthenticationEndpoint = nex.NewPRUDPEndPoint(1)
+	globals.AuthenticationEndpoint.ServerAccount = globals.AuthenticationServerAccount
+	globals.AuthenticationEndpoint.AccountDetailsByPID = globals.AccountDetailsByPID
+	globals.AuthenticationEndpoint.AccountDetailsByUsername = globals.AccountDetailsByUsername
+	// * The default silence time is too low for Mario Kart 7, so we set a higher value
+	globals.AuthenticationEndpoint.DefaultStreamSettings.MaxSilenceTime = 20000
+	globals.AuthenticationServer.BindPRUDPEndPoint(globals.AuthenticationEndpoint)
 
-		fmt.Println("==Pokemon X/Y/OR/AS (Gen 6) - Auth==")
-		fmt.Printf("Protocol ID: %#v\n", request.ProtocolID())
-		fmt.Printf("Method ID: %#v\n", request.MethodID())
-		fmt.Println("===============")
+	globals.AuthenticationServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 3, 0))
+	globals.AuthenticationServer.AccessKey = "876138df"
+
+	globals.AuthenticationEndpoint.OnData(func(packet nex.PacketInterface) {
+		request := packet.RMCMessage()
+
+		fmt.Println("=== POKEGEN6 - Auth ===")
+		fmt.Printf("Protocol ID: %#v\n", request.ProtocolID)
+		fmt.Printf("Method ID: %#v\n", request.MethodID)
+		fmt.Println("==================")
 	})
 
 	registerCommonAuthenticationServerProtocols()
 
-	globals.AuthenticationServer.Listen(fmt.Sprintf(":%s", os.Getenv("PN_POKEGEN6_AUTHENTICATION_SERVER_PORT")))
+	port, _ := strconv.Atoi(os.Getenv("PN_POKEGEN6_AUTHENTICATION_SERVER_PORT"))
+
+	globals.AuthenticationServer.Listen(port)
 }

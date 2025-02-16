@@ -1,15 +1,43 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go"
+	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2/types"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
-	"github.com/PretendoNetwork/nex-protocols-go/subscription"
+	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
 )
 
-func UpdateMySubscriptionData(err error, client *nex.Client, callID uint32, unk uint32, content []byte) {
-	globals.Timeline[client.PID()] = content
+func UpdateMySubscriptionData(err error, packet nex.PacketInterface, callID uint32, unk *types.PrimitiveU32, content []byte) (*nex.RMCMessage, *nex.Error) {
+	if err != nil {
+		globals.Logger.Error(err.Error())
+		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
+	}
 
-	rmcResponse := nex.NewRMCResponse(subscription.ProtocolID, callID)
+	client := packet.Sender()
+
+	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
+
+	globals.Timeline[client.PID().LegacyValue()] = content
+
+	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
+	rmcResponse.ProtocolID = subscription.ProtocolID
+	rmcResponse.MethodID = subscription.MethodUpdateMySubscriptionData
+	rmcResponse.CallID = callID
+
+	return rmcResponse, nil
+
+	/*if err != nil {
+		globals.Logger.Error(err.Error())
+		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
+	}
+
+	client := packet.Sender()
+
+	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
+	server := endpoint.Server
+	globals.Timeline[client.PID()] = content*/
+
+	/*rmcResponse := nex.NewRMCResponse(subscription.ProtocolID, callID)
 	rmcResponse.SetSuccess(subscription.MethodUpdateMySubscriptionData, nil)
 
 	rmcResponseBytes := rmcResponse.Bytes()
@@ -25,5 +53,5 @@ func UpdateMySubscriptionData(err error, client *nex.Client, callID uint32, unk 
 	responsePacket.AddFlag(nex.FlagNeedsAck)
 	responsePacket.AddFlag(nex.FlagReliable)
 
-	globals.SecureServer.Send(responsePacket)
+	globals.SecureServer.Send(responsePacket)*/
 }
