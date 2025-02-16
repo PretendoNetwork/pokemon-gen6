@@ -1,27 +1,26 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go"
+	nex "github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
-	"github.com/PretendoNetwork/nex-protocols-go/subscription"
+	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
 )
 
-func GetPrivacyLevels(err error, client *nex.Client, callID uint32) {
-	rmcResponse := nex.NewRMCResponse(subscription.ProtocolID, callID)
-	rmcResponse.SetSuccess(subscription.MethodGetPrivacyLevels, nil)
+func GetPrivacyLevels(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
+	if err != nil {
+		globals.Logger.Error(err.Error())
+		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
+	}
 
-	rmcResponseBytes := rmcResponse.Bytes()
+	client := packet.Sender()
 
-	responsePacket, _ := nex.NewPacketV1(client, nil)
+	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
-	responsePacket.SetVersion(1)
-	responsePacket.SetSource(0xA1)
-	responsePacket.SetDestination(0xAF)
-	responsePacket.SetType(nex.DataPacket)
-	responsePacket.SetPayload(rmcResponseBytes)
+	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
+	rmcResponse.ProtocolID = subscription.ProtocolID
+	rmcResponse.MethodID = subscription.MethodGetPrivacyLevels
+	rmcResponse.CallID = callID
 
-	responsePacket.AddFlag(nex.FlagNeedsAck)
-	responsePacket.AddFlag(nex.FlagReliable)
-
-	globals.SecureServer.Send(responsePacket)
+	return rmcResponse, nil
 }
+
