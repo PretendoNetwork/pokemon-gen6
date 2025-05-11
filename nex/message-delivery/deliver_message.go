@@ -1,15 +1,15 @@
 package nex_message_delivery
 
 import (
-	"encoding/hex"
+	"strconv"
+	"time"
+
 	nex "github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 	"github.com/PretendoNetwork/nex-go/v2/types"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	message_delivery "github.com/PretendoNetwork/nex-protocols-go/v2/message-delivery"
 	messaging_types "github.com/PretendoNetwork/nex-protocols-go/v2/messaging/types"
-	"fmt"
-	"strconv"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
 func DeliverMessage(err error, packet nex.PacketInterface, callID uint32, oUserMessage types.DataHolder) (*nex.RMCMessage, *nex.Error) {
@@ -23,24 +23,44 @@ func DeliverMessage(err error, packet nex.PacketInterface, callID uint32, oUserM
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 	server := endpoint.Server
 
-	oUserMessage.Object.(*messaging_types.TextMessage).UserMessage.StrSender = types.NewString(strconv.Itoa(int(client.PID())))
-	oUserMessage.Object.(*messaging_types.TextMessage).UserMessage.PIDSender = client.PID()
+	var idRecipient uint64
+
+	switch oUserMessage.Object.ObjectID() {
+	case types.NewString("BinaryMessage"):
+		binaryMessage := oUserMessage.Object.(messaging_types.BinaryMessage)
+
+		binaryMessage.StrSender = types.NewString(strconv.Itoa(int(client.PID())))
+		binaryMessage.PIDSender = client.PID()
+		binaryMessage.Receptiontime.FromTimestamp(time.Now().UTC())
+		idRecipient = uint64(binaryMessage.IDRecipient)
+
+		oUserMessage.Object = binaryMessage
+	case types.NewString("TextMessage"):
+		textMessage := oUserMessage.Object.(messaging_types.TextMessage)
+
+		textMessage.StrSender = types.NewString(strconv.Itoa(int(client.PID())))
+		textMessage.PIDSender = client.PID()
+		textMessage.Receptiontime.FromTimestamp(time.Now().UTC())
+		idRecipient = uint64(textMessage.IDRecipient)
+
+		oUserMessage.Object = textMessage
+	default:
+		idRecipient = 0
+		return nil, nex.NewError(nex.ResultCodes.Core.Unknown, "Invalid type for deliver message")
+	}
 
 	messageStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 	oUserMessage.WriteTo(messageStream)
 
 	messageRequest := nex.NewRMCRequest(endpoint)
 	messageRequest.ProtocolID = message_delivery.ProtocolID
-	messageRequest.CallID = 0xffffffff
+	messageRequest.CallID = callID
 	messageRequest.MethodID = message_delivery.MethodDeliverMessage
 	messageRequest.Parameters = messageStream.Bytes()
 
 	messageRequestBytes := messageRequest.Bytes()
 
-	fmt.Println(hex.EncodeToString(messageRequest.Parameters))
-
-	fmt.Println(uint32(oUserMessage.Object.(*messaging_types.TextMessage).UserMessage.IDRecipient))
-	target := endpoint.FindConnectionByPID(uint64(oUserMessage.Object.(*messaging_types.TextMessage).UserMessage.IDRecipient))
+	target := endpoint.FindConnectionByPID(idRecipient)
 
 	var messagePacket nex.PRUDPPacketInterface
 
@@ -68,4 +88,3 @@ func DeliverMessage(err error, packet nex.PacketInterface, callID uint32, oUserM
 
 	return rmcResponse, nil
 }
-

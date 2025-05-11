@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2/types"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
@@ -22,12 +23,13 @@ func StartSecureServer() {
 	globals.SecureServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 3, 0))
 	globals.SecureServer.AccessKey = "876138df"
 
-	globals.Timeline = make(map[uint32][]uint8)
+	globals.Timeline = make(map[uint32]types.QBuffer)
 
 	globals.SecureEndpoint.OnData(func(packet nex.PacketInterface) {
 		request := packet.RMCMessage()
 
 		fmt.Println("=== Pokemon X/Y/OR/AS (Gen 6) - Secure ===")
+		fmt.Printf("User: %d\n", packet.Sender().PID())
 		fmt.Printf("Protocol ID: %d\n", request.ProtocolID)
 		fmt.Printf("Method ID: %d\n", request.MethodID)
 		fmt.Println("====================")

@@ -1,15 +1,16 @@
 package nex
 
 import (
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	datastore "github.com/PretendoNetwork/nex-protocols-go/v2/datastore"
 	message_delivery "github.com/PretendoNetwork/nex-protocols-go/v2/message-delivery"
-	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
 	rating "github.com/PretendoNetwork/nex-protocols-go/v2/rating"
+	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 
 	nex_message_delivery "github.com/PretendoNetwork/pokemon-gen6/nex/message-delivery"
-	nex_subscription "github.com/PretendoNetwork/pokemon-gen6/nex/subscription"
 	nex_rating "github.com/PretendoNetwork/pokemon-gen6/nex/rating"
+	nex_subscription "github.com/PretendoNetwork/pokemon-gen6/nex/subscription"
+	nex_subscription_custom_handlers "github.com/PretendoNetwork/pokemon-gen6/nex/subscription/custom_handlers"
 )
 
 func registerSecureServerNEXProtocols() {
@@ -24,8 +25,6 @@ func registerSecureServerNEXProtocols() {
 	subscriptionProtocol := subscription.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(subscriptionProtocol)
 
-	subscriptionProtocol.CreateMySubscriptionData = nex_subscription.CreateMySubscriptionData
-	subscriptionProtocol.UpdateMySubscriptionData = nex_subscription.UpdateMySubscriptionData
 	subscriptionProtocol.GetFriendSubscriptionData = nex_subscription.GetFriendSubscriptionData
 	subscriptionProtocol.GetTargetSubscriptionData = nex_subscription.GetTargetSubscriptionData
 	subscriptionProtocol.GetActivePlayerSubscriptionData = nex_subscription.GetActivePlayerSubscriptionData
@@ -33,10 +32,16 @@ func registerSecureServerNEXProtocols() {
 	subscriptionProtocol.ReplaceTargetAndGetSubscriptionData = nex_subscription.ReplaceTargetAndGetSubscriptionData
 	subscriptionProtocol.GetPrivacyLevels = nex_subscription.GetPrivacyLevels
 
+	patches := nex_subscription_custom_handlers.NewProtocol()
+	patches.CreateMySubscriptionData = nex_subscription.CreateMySubscriptionData
+	patches.UpdateMySubscriptionData = nex_subscription.UpdateMySubscriptionData
+
+	subscriptionProtocol.Patches = patches
+	subscriptionProtocol.PatchedMethods = []uint32{1, 2}
+
 	ratingProtocol := rating.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(ratingProtocol)
 
 	ratingProtocol.Unk1 = nex_rating.Unk1
 	ratingProtocol.Unk2 = nex_rating.Unk2
 }
-

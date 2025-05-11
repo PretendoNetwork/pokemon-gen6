@@ -1,3 +1,5 @@
 package globals
 
-var Timeline map[uint32][]uint8
+import "github.com/PretendoNetwork/nex-go/v2/types"
+
+var Timeline map[uint32]types.QBuffer

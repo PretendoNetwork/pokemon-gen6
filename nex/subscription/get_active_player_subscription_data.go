@@ -2,11 +2,12 @@ package nex_subscription
 
 import (
 	"encoding/hex"
-	"fmt"
+
 	nex "github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
+	subscription_types "github.com/PretendoNetwork/pokemon-gen6/nex/subscription/types"
 )
 
 func GetActivePlayerSubscriptionData(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
@@ -21,16 +22,23 @@ func GetActivePlayerSubscriptionData(err error, packet nex.PacketInterface, call
 
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 
-	types.UInt32(uint32(len(globals.Timeline))).WriteTo(rmcResponseStream)
+	activePlayerSubscriptionList := types.NewList[subscription_types.ActivePlayerSubscriptionData]()
+
 	for clientPID := range globals.Timeline {
-		types.UInt32(clientPID).WriteTo(rmcResponseStream)
-		for j := 0; j < len(globals.Timeline[clientPID]); j++ {
-			types.UInt8(globals.Timeline[clientPID][j]).WriteTo(rmcResponseStream)
-		}
+		activePlayerSubscription := subscription_types.NewActivePlayerSubscriptionData()
+
+		activePlayerSubscription.ByteUnk = 1
+		activePlayerSubscription.SubscriptionData.OwnerPID = types.UInt32(clientPID)
+		activePlayerSubscription.SubscriptionData.Data = globals.Timeline[clientPID]
+
+		activePlayerSubscriptionList = append(activePlayerSubscriptionList, activePlayerSubscription)
 	}
 
+	activePlayerSubscriptionList.WriteTo(rmcResponseStream)
+
 	rmcResponseBody := rmcResponseStream.Bytes()
-	fmt.Println(hex.EncodeToString(rmcResponseBody))
+
+	globals.Logger.Info(hex.EncodeToString(rmcResponseBody))
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, rmcResponseBody)
 	rmcResponse.ProtocolID = subscription.ProtocolID
@@ -39,4 +47,3 @@ func GetActivePlayerSubscriptionData(err error, packet nex.PacketInterface, call
 
 	return rmcResponse, nil
 }
-
