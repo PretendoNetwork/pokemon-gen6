@@ -2,6 +2,8 @@ package nex
 
 import (
 	"fmt"
+	"crypto/rand"
+	"encoding/binary"
 
 	nex "github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
@@ -11,17 +13,30 @@ import (
 	common_matchmake_extension "github.com/PretendoNetwork/nex-protocols-common-go/v2/matchmake-extension"
 	common_nat_traversal "github.com/PretendoNetwork/nex-protocols-common-go/v2/nat-traversal"
 	common_secure "github.com/PretendoNetwork/nex-protocols-common-go/v2/secure-connection"
+	common_utility "github.com/PretendoNetwork/nex-protocols-common-go/v2/utility"
 	match_making "github.com/PretendoNetwork/nex-protocols-go/v2/match-making"
 	match_making_ext "github.com/PretendoNetwork/nex-protocols-go/v2/match-making-ext"
 	mm_types "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 	matchmake_extension "github.com/PretendoNetwork/nex-protocols-go/v2/matchmake-extension"
 	nat_traversal "github.com/PretendoNetwork/nex-protocols-go/v2/nat-traversal"
 	secure "github.com/PretendoNetwork/nex-protocols-go/v2/secure-connection"
+	utility "github.com/PretendoNetwork/nex-protocols-go/v2/utility"
 	"github.com/PretendoNetwork/pokemon-gen6/database"
 	local_globals "github.com/PretendoNetwork/pokemon-gen6/globals"
 
 	nex_matchmake_extension_common "github.com/PretendoNetwork/pokemon-gen6/nex/matchmake-extension/common"
 )
+
+func generateNEXUniqueIDHandler() uint64 {
+	var uniqueID uint64
+
+	err := binary.Read(rand.Reader, binary.BigEndian, &uniqueID)
+	if err != nil {
+		local_globals.Logger.Error(err.Error())
+	}
+
+	return uniqueID
+}
 
 func registerCommonSecureServerProtocols() {
 	secureProtocol := secure.NewProtocol()
@@ -30,12 +45,18 @@ func registerCommonSecureServerProtocols() {
 	secure.CreateReportDBRecord = func(pid types.PID, reportID types.UInt32, reportData types.QBuffer) error {
 		return nil
 	}
+	secure.EnableInsecureRegister()
 
 	matchmakingManager := common_globals.NewMatchmakingManager(local_globals.SecureEndpoint, database.Postgres)
 
 	natTraversalProtocol := nat_traversal.NewProtocol()
 	local_globals.SecureEndpoint.RegisterServiceProtocol(natTraversalProtocol)
 	common_nat_traversal.NewCommonProtocol(natTraversalProtocol)
+
+	utilityProtocol := utility.NewProtocol()
+	local_globals.SecureEndpoint.RegisterServiceProtocol(utilityProtocol)
+	commonUtilityProtocol := common_utility.NewCommonProtocol(utilityProtocol)
+	commonUtilityProtocol.GenerateNEXUniqueID = generateNEXUniqueIDHandler
 
 	matchMakingProtocol := match_making.NewProtocol()
 	local_globals.SecureEndpoint.RegisterServiceProtocol(matchMakingProtocol)

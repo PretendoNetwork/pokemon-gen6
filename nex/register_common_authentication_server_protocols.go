@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/constants"
 	"github.com/PretendoNetwork/nex-go/v2/types"
 	common_ticket_granting "github.com/PretendoNetwork/nex-protocols-common-go/v2/ticket-granting"
@@ -31,5 +32,13 @@ func registerCommonAuthenticationServerProtocols() {
 	commonTicketGrantingProtocol.SecureStationURL = secureStationURL
 	commonTicketGrantingProtocol.BuildName = types.NewString(serverBuildString)
 	commonTicketGrantingProtocol.SecureServerAccount = globals.SecureServerAccount
+	if globals.LocalAuthMode {
+		commonTicketGrantingProtocol.ValidateLoginData = func(pid types.PID, loginData types.DataHolder) *nex.Error {
+			// my friends always told me i was valid no matter what. surely my login data is the same
+			return nil
+		}
+	} else {
+		commonTicketGrantingProtocol.SetPretendoValidation(globals.TokenAESKey)
+	}
 }
 

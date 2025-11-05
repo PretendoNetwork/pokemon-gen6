@@ -17,3 +17,6 @@ var SecureEndpoint *nex.PRUDPEndPoint
 var GRPCAccountClientConnection *grpc.ClientConn
 var GRPCAccountClient pb.AccountClient
 var GRPCAccountCommonMetadata metadata.MD
+
+var TokenAESKey []byte
+var LocalAuthMode bool
