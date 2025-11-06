@@ -2,12 +2,12 @@ package nex_subscription
 
 import (
 	"github.com/PretendoNetwork/nex-go/v2"
-	rating "github.com/PretendoNetwork/nex-protocols-go/v2/rating"
-	rating_types "github.com/PretendoNetwork/nex-protocols-go/v2/rating/types"
+	"github.com/PretendoNetwork/nex-go/v2/types"
+	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
-func Unk2(err error, packet nex.PacketInterface, callID uint32, sessionToken rating_types.RatingSessionToken) (*nex.RMCMessage, *nex.Error) {
+func AddTarget(err error, packet nex.PacketInterface, callID uint32, targets types.List[types.PID]) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		globals.Logger.Error(err.Error())
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
@@ -17,9 +17,11 @@ func Unk2(err error, packet nex.PacketInterface, callID uint32, sessionToken rat
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
+	// TODO: handle add target
+
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
-	rmcResponse.ProtocolID = rating.ProtocolID
-	rmcResponse.MethodID = rating.MethodUnk2
+	rmcResponse.ProtocolID = subscription.ProtocolID
+	rmcResponse.MethodID = subscription.MethodGetPrivacyLevel
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil

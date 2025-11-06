@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
@@ -38,4 +38,3 @@ func StartAuthenticationServer() {
 
 	globals.AuthenticationServer.Listen(port)
 }
-

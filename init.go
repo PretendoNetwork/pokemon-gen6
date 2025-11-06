@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
@@ -40,6 +41,7 @@ func init() {
 	friendsGRPCPort := os.Getenv("PN_POKEGEN6_FRIENDS_GRPC_PORT")
 	friendsGRPCAPIKey := os.Getenv("PN_POKEGEN6_FRIENDS_GRPC_API_KEY")
 	postgresURI := os.Getenv("PN_POKEGEN6_POSTGRES_URI")
+	tokenAesKey := os.Getenv("PN_POKEGEN6_AES_KEY")
 
 	if strings.TrimSpace(postgresURI) == "" {
 		globals.Logger.Error("PN_POKEGEN6_POSTGRES_URI environment variable not set")
@@ -55,8 +57,8 @@ func init() {
 
 	globals.KerberosPassword = string(kerberosPassword)
 
-	globals.AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", globals.KerberosPassword)
-	globals.SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", globals.KerberosPassword)
+	globals.AuthenticationServerAccount = nex.NewAccount(types.NewPID(1), "Quazal Authentication", globals.KerberosPassword, false)
+	globals.SecureServerAccount = nex.NewAccount(types.NewPID(2), "Quazal Rendez-Vous", globals.KerberosPassword, false)
 
 	if strings.TrimSpace(authenticationServerPort) == "" {
 		globals.Logger.Error("PN_POKEGEN6_AUTHENTICATION_SERVER_PORT environment variable not set")
@@ -154,6 +156,17 @@ func init() {
 	globals.GRPCFriendsCommonMetadata = metadata.Pairs(
 		"X-API-Key", friendsGRPCAPIKey,
 	)
+
+	if strings.TrimSpace(tokenAesKey) == "" {
+		globals.Logger.Error("PN_POKEGEN6_AES_KEY not set!")
+		os.Exit(0)
+	}
+
+	globals.TokenAESKey, err = hex.DecodeString(tokenAesKey)
+	if err != nil {
+		globals.Logger.Errorf("Failed to decode AES key: %v", err)
+		os.Exit(0)
+	}
 
 	database.ConnectPostgres()
 }

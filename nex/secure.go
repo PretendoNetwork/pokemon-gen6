@@ -5,8 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	nex "github.com/PretendoNetwork/nex-go/v2"
-	"github.com/PretendoNetwork/nex-go/v2/types"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
@@ -23,16 +22,31 @@ func StartSecureServer() {
 	globals.SecureServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 3, 0))
 	globals.SecureServer.AccessKey = "876138df"
 
-	globals.Timeline = make(map[uint32]types.QBuffer)
+	globals.Timeline = make(globals.SubscriptionDataTimeline)
+	globals.DataTargets = make(globals.SubscriptionDataTargets)
 
 	globals.SecureEndpoint.OnData(func(packet nex.PacketInterface) {
 		request := packet.RMCMessage()
+		protocol := globals.GetProtocolByID(request.ProtocolID)
 
 		fmt.Println("=== Pokemon X/Y/OR/AS (Gen 6) - Secure ===")
 		fmt.Printf("User: %d\n", packet.Sender().PID())
-		fmt.Printf("Protocol ID: %d\n", request.ProtocolID)
-		fmt.Printf("Method ID: %d\n", request.MethodID)
+		fmt.Printf("Protocol: %d (%s)\n", request.ProtocolID, protocol.Protocol())
+		fmt.Printf("Method: %d (%s)\n", request.MethodID, protocol.GetMethodByID(request.MethodID))
 		fmt.Println("====================")
+	})
+
+	globals.SecureEndpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
+		// let friends know that user has gone offline
+		globals.HandleSubscriptionOfflineNotification(connection.PID())
+
+		// mark as inactive
+		if globals.Timeline.HasData(connection.PID()) {
+			holder := globals.Timeline[connection.PID()]
+			holder.IsActive = false
+
+			globals.Timeline[connection.PID()] = holder
+		}
 	})
 
 	registerCommonSecureServerProtocols()

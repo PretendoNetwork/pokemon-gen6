@@ -1,12 +1,13 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go/v2"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
+	"github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2/types"
 	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
-func GetPrivacyLevels(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
+func SetPrivacyLevel(err error, packet nex.PacketInterface, callID uint32, privacyLevel types.UInt32) (*nex.RMCMessage, *nex.Error) {
 	if err != nil {
 		globals.Logger.Error(err.Error())
 		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, err.Error())
@@ -16,11 +17,12 @@ func GetPrivacyLevels(err error, packet nex.PacketInterface, callID uint32) (*ne
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
+	// TODO: handle set privacy level properly
+
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
-	rmcResponse.MethodID = subscription.MethodGetPrivacyLevels
+	rmcResponse.MethodID = subscription.MethodGetPrivacyLevel
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil
 }
-

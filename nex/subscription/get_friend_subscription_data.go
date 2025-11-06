@@ -1,13 +1,11 @@
 package nex_subscription
 
 import (
-	"encoding/hex"
-
-	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
 	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	subscription_types "github.com/PretendoNetwork/nex-protocols-go/v2/subscription/types"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
-	subscription_types "github.com/PretendoNetwork/pokemon-gen6/nex/subscription/types"
 )
 
 func GetFriendSubscriptionData(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
@@ -27,11 +25,11 @@ func GetFriendSubscriptionData(err error, packet nex.PacketInterface, callID uin
 	friendSubscriptionDataList := types.NewList[subscription_types.SubscriptionData]()
 
 	for _, pid := range friendPids {
-		if globals.Timeline[pid] != nil {
+		if globals.Timeline.HasData(types.PID(pid)) {
 			friendSubscriptionData := subscription_types.NewSubscriptionData()
 
-			friendSubscriptionData.OwnerPID = types.UInt32(pid)
-			friendSubscriptionData.Data = globals.Timeline[pid]
+			friendSubscriptionData.PrincipalID = types.PID(pid)
+			friendSubscriptionData.Unknown = globals.Timeline.GetData(types.PID(pid)).Data.Unknown
 
 			friendSubscriptionDataList = append(friendSubscriptionDataList, friendSubscriptionData)
 		}
@@ -40,8 +38,6 @@ func GetFriendSubscriptionData(err error, packet nex.PacketInterface, callID uin
 	friendSubscriptionDataList.WriteTo(rmcResponseStream)
 
 	rmcResponseBody := rmcResponseStream.Bytes()
-
-	globals.Logger.Info(hex.EncodeToString(rmcResponseBody))
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, rmcResponseBody)
 	rmcResponse.ProtocolID = subscription.ProtocolID

@@ -1,10 +1,10 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	rating "github.com/PretendoNetwork/nex-protocols-go/v2/rating"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
 func Unk1(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
@@ -32,4 +32,3 @@ func Unk1(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage
 
 	return rmcResponse, nil
 }
-

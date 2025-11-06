@@ -1,11 +1,10 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go/v2"
-	"github.com/PretendoNetwork/nex-go/v2/types"
+	"github.com/PretendoNetwork/nex-go/v2"
 	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	subscription_types "github.com/PretendoNetwork/nex-protocols-go/v2/subscription/types"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
-	subscription_types "github.com/PretendoNetwork/pokemon-gen6/nex/subscription/types"
 )
 
 func UpdateMySubscriptionData(err error, packet nex.PacketInterface, callID uint32, param subscription_types.SubscriptionData) (*nex.RMCMessage, *nex.Error) {
@@ -18,7 +17,9 @@ func UpdateMySubscriptionData(err error, packet nex.PacketInterface, callID uint
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
-	globals.Timeline[uint32(client.PID())] = param.Data.Copy().(types.QBuffer)
+	param.PrincipalID = client.PID()
+	globals.Timeline.UpdateData(client.PID(), param)
+	globals.HandleSubscriptionChangeNotification(client.PID())
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
