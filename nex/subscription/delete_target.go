@@ -21,7 +21,7 @@ func DeleteTarget(err error, packet nex.PacketInterface, callID uint32, targets 
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
-	rmcResponse.MethodID = subscription.MethodGetPrivacyLevel
+	rmcResponse.MethodID = subscription.MethodDeleteTarget
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil

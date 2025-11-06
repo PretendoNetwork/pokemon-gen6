@@ -20,7 +20,7 @@ func ClearMySubscriptionData(err error, packet nex.PacketInterface, callID uint3
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
-	rmcResponse.MethodID = subscription.MethodCreateMySubscriptionData
+	rmcResponse.MethodID = subscription.MethodClearMySubscriptionData
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil

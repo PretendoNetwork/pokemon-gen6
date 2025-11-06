@@ -21,7 +21,7 @@ func SetPrivacyLevel(err error, packet nex.PacketInterface, callID uint32, priva
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
-	rmcResponse.MethodID = subscription.MethodGetPrivacyLevel
+	rmcResponse.MethodID = subscription.MethodSetPrivacyLevel
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil

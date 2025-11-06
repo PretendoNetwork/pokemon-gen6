@@ -21,7 +21,7 @@ func AddTarget(err error, packet nex.PacketInterface, callID uint32, targets typ
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
-	rmcResponse.MethodID = subscription.MethodGetPrivacyLevel
+	rmcResponse.MethodID = subscription.MethodAddTarget
 	rmcResponse.CallID = callID
 
 	return rmcResponse, nil
