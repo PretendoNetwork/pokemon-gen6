@@ -31,3 +31,6 @@ var TokenAESKey []byte
 
 var MatchmakingManager *common_globals.MatchmakingManager
 var MessagingManager *common_globals.MessagingManager
+
+var SubscriptionTimeline SubscriptionDataTimeline
+var SubscriptionTargets SubscriptionDataTargets

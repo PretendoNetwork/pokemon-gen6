@@ -27,8 +27,13 @@ func GetSubscriptionData(err error, packet nex.PacketInterface, callID uint32, p
 
 		subscriptionData := subscription_types.NewSubscriptionData()
 
-		subscriptionData.PrincipalID = pid
-		subscriptionData.Unknown = globals.Timeline.GetData(pid).Data.Unknown
+		data, err := globals.SubscriptionTimeline.GetData(pid)
+		if err != nil {
+			return nil, err
+		}
+
+		subscriptionData.PrincipalID = data.Data.PrincipalID
+		subscriptionData.Unknown = data.Data.Unknown
 
 		subscriptionDataList = append(subscriptionDataList, subscriptionData)
 	}

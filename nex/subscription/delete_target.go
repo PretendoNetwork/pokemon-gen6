@@ -17,7 +17,7 @@ func DeleteTarget(err error, packet nex.PacketInterface, callID uint32, targets 
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
-	globals.DataTargets.DeleteTargets(client.PID(), targets)
+	globals.SubscriptionTargets.DeleteTargets(client.PID(), targets)
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID

@@ -22,8 +22,8 @@ func StartSecureServer() {
 	globals.SecureServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 3, 0))
 	globals.SecureServer.AccessKey = "876138df"
 
-	globals.Timeline = make(globals.SubscriptionDataTimeline)
-	globals.DataTargets = make(globals.SubscriptionDataTargets)
+	globals.SubscriptionTimeline = make(globals.SubscriptionDataTimeline)
+	globals.SubscriptionTargets = make(globals.SubscriptionDataTargets)
 
 	globals.SecureEndpoint.OnData(func(packet nex.PacketInterface) {
 		request := packet.RMCMessage()
@@ -37,16 +37,8 @@ func StartSecureServer() {
 	})
 
 	globals.SecureEndpoint.OnConnectionEnded(func(connection *nex.PRUDPConnection) {
-		// let friends know that user has gone offline
-		globals.HandleSubscriptionOfflineNotification(connection.PID())
-
-		// mark as inactive
-		if globals.Timeline.HasData(connection.PID()) {
-			holder := globals.Timeline[connection.PID()]
-			holder.IsActive = false
-
-			globals.Timeline[connection.PID()] = holder
-		}
+		// clear user notification data
+		globals.SubscriptionTimeline.ClearData(connection.PID(), globals.SubscriptionTargets)
 	})
 
 	registerCommonSecureServerProtocols()

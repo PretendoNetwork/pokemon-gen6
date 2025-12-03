@@ -23,14 +23,19 @@ func ReplaceTargetAndGetSubscriptionData(err error, packet nex.PacketInterface, 
 	globals.Logger.Infof("ReplaceTargetAndGetSubscriptionData | newTargets: %s", newTargets.String())
 	targetSubscriptionList := types.NewList[subscription_types.SubscriptionData]()
 
-	globals.DataTargets.ReplaceTargets(client.PID(), newTargets)
+	globals.SubscriptionTargets.ReplaceTargets(client.PID(), newTargets)
 
-	for _, target := range globals.DataTargets.GetTargets(client.PID()) {
-		if !globals.Timeline.HasData(target) {
+	for _, target := range globals.SubscriptionTargets.GetTargets(client.PID()) {
+		if !globals.SubscriptionTimeline.HasData(target) {
 			continue
 		}
 
-		targetSubscriptionList = append(targetSubscriptionList, globals.Timeline.GetData(target).Data.Copy().(subscription_types.SubscriptionData))
+		data, err := globals.SubscriptionTimeline.GetData(target)
+		if err != nil {
+			return nil, err
+		}
+
+		targetSubscriptionList = append(targetSubscriptionList, data.Data.Copy().(subscription_types.SubscriptionData))
 	}
 
 	targetSubscriptionList.WriteTo(rmcResponseStream)

@@ -5,15 +5,13 @@ go 1.25.0
 require (
 	github.com/PretendoNetwork/grpc-go v1.0.2
 	github.com/PretendoNetwork/nex-go/v2 v2.1.5
-	github.com/PretendoNetwork/nex-protocols-common-go/v2 v2.4.0
+	github.com/PretendoNetwork/nex-protocols-common-go/v2 v2.4.1-0.20251112220651-a4e3459a38c0
 	github.com/PretendoNetwork/nex-protocols-go/v2 v2.2.2-0.20251031171904-9de49b5c6449
 	github.com/PretendoNetwork/plogger-go v1.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	google.golang.org/grpc v1.70.0
 )
-
-replace github.com/PretendoNetwork/nex-protocols-common-go/v2 => ../nex-protocols-common-go
 
 require (
 	github.com/PretendoNetwork/pq-extended v1.0.0 // indirect

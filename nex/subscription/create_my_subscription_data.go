@@ -21,8 +21,7 @@ func CreateMySubscriptionData(err error, packet nex.PacketInterface, callID uint
 	globals.Logger.Infof("CreateMySubscriptionData | unk: %d | unk2: %s", unk, unk2.String())
 
 	param.PrincipalID = client.PID()
-	globals.Timeline.CreateData(client.PID(), param, globals.DataTargets)
-	globals.HandleSubscriptionChangeNotification(client.PID())
+	globals.SubscriptionTimeline.CreateData(client.PID(), param, globals.SubscriptionTargets)
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID

@@ -23,11 +23,22 @@ func GetActivePlayerSubscriptionData(err error, packet nex.PacketInterface, call
 	globals.Logger.Infof("GetActivePlayerSubscriptionData | unk1: %d | unk2: %d | unk3: %d", unk1, unk2, unk3)
 	activePlayerSubscriptionList := types.NewList[subscription_types.ActivePlayerSubscriptionData]()
 
-	for targetPID := range globals.Timeline {
-		target := globals.Timeline.GetData(targetPID)
+	// this seems arbitrary but it seems to make sense in the context of packet dumps
+	// the presence of two numbers may have something to do with the unknown field in ActivePlayerSubscriptionData
+	count := unk1 + unk2
+	if count > 100 || count == 0 {
+		count = 100
+	}
 
-		if !target.IsActive {
-			continue
+	i := 0
+	for targetPID := range globals.SubscriptionTimeline {
+		if i >= int(count) {
+			break
+		}
+
+		target, err := globals.SubscriptionTimeline.GetData(targetPID)
+		if err != nil {
+			return nil, err
 		}
 
 		activePlayerSubscription := subscription_types.NewActivePlayerSubscriptionData()
@@ -37,6 +48,8 @@ func GetActivePlayerSubscriptionData(err error, packet nex.PacketInterface, call
 		activePlayerSubscription.SubscriptionData.Unknown = target.Data.Unknown
 
 		activePlayerSubscriptionList = append(activePlayerSubscriptionList, activePlayerSubscription)
+
+		i++
 	}
 
 	activePlayerSubscriptionList.WriteTo(rmcResponseStream)

@@ -18,8 +18,7 @@ func UpdateMySubscriptionData(err error, packet nex.PacketInterface, callID uint
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
 	param.PrincipalID = client.PID()
-	globals.Timeline.UpdateData(client.PID(), param)
-	globals.HandleSubscriptionChangeNotification(client.PID())
+	globals.SubscriptionTimeline.UpdateData(client.PID(), param)
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID

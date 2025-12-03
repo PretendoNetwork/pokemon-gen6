@@ -25,11 +25,16 @@ func GetFriendSubscriptionData(err error, packet nex.PacketInterface, callID uin
 	friendSubscriptionDataList := types.NewList[subscription_types.SubscriptionData]()
 
 	for _, pid := range friendPids {
-		if globals.Timeline.HasData(types.PID(pid)) {
+		if globals.SubscriptionTimeline.HasData(types.PID(pid)) {
 			friendSubscriptionData := subscription_types.NewSubscriptionData()
 
-			friendSubscriptionData.PrincipalID = types.PID(pid)
-			friendSubscriptionData.Unknown = globals.Timeline.GetData(types.PID(pid)).Data.Unknown
+			data, err := globals.SubscriptionTimeline.GetData(types.PID(pid))
+			if err != nil {
+				return nil, err
+			}
+
+			friendSubscriptionData.PrincipalID = data.Data.PrincipalID
+			friendSubscriptionData.Unknown = data.Data.Unknown.Copy().(types.QBuffer)
 
 			friendSubscriptionDataList = append(friendSubscriptionDataList, friendSubscriptionData)
 		}

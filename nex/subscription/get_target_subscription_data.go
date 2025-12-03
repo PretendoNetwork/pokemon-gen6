@@ -22,13 +22,18 @@ func GetTargetSubscriptionData(err error, packet nex.PacketInterface, callID uin
 
 	targetSubscriptionList := types.NewList[subscription_types.SubscriptionData]()
 
-	if len(globals.DataTargets.GetTargets(client.PID())) > 0 {
-		for _, target := range globals.DataTargets.GetTargets(client.PID()) {
-			if !globals.Timeline.HasData(target) {
+	if len(globals.SubscriptionTargets.GetTargets(client.PID())) > 0 {
+		for _, target := range globals.SubscriptionTargets.GetTargets(client.PID()) {
+			if !globals.SubscriptionTimeline.HasData(target) {
 				continue
 			}
 
-			targetSubscriptionList = append(targetSubscriptionList, globals.Timeline.GetData(target).Data.Copy().(subscription_types.SubscriptionData))
+			data, err := globals.SubscriptionTimeline.GetData(target)
+			if err != nil {
+				return nil, err
+			}
+
+			targetSubscriptionList = append(targetSubscriptionList, data.Data.Copy().(subscription_types.SubscriptionData))
 		}
 	}
 

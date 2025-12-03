@@ -16,7 +16,7 @@ func ClearTarget(err error, packet nex.PacketInterface, callID uint32) (*nex.RMC
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
-	globals.DataTargets.ClearTargets(client.PID())
+	globals.SubscriptionTargets.ClearTargets(client.PID())
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID

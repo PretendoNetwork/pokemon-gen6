@@ -16,7 +16,7 @@ func ClearMySubscriptionData(err error, packet nex.PacketInterface, callID uint3
 
 	endpoint := client.Endpoint().(*nex.PRUDPEndPoint)
 
-	globals.Timeline.ClearData(client.PID(), globals.DataTargets)
+	globals.SubscriptionTimeline.ClearData(client.PID(), globals.SubscriptionTargets)
 
 	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
 	rmcResponse.ProtocolID = subscription.ProtocolID
