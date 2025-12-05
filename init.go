@@ -169,4 +169,5 @@ func init() {
 	}
 
 	database.ConnectPostgres()
+	database.InitUtilityDatabase()
 }

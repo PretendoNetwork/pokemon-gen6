@@ -1,8 +1,6 @@
 package nex
 
 import (
-	"crypto/rand"
-	"encoding/binary"
 	"fmt"
 
 	"github.com/PretendoNetwork/nex-go/v2"
@@ -24,21 +22,11 @@ import (
 	secure "github.com/PretendoNetwork/nex-protocols-go/v2/secure-connection"
 	utility "github.com/PretendoNetwork/nex-protocols-go/v2/utility"
 	"github.com/PretendoNetwork/pokemon-gen6/database"
+	database_utility "github.com/PretendoNetwork/pokemon-gen6/database/utility"
 	"github.com/PretendoNetwork/pokemon-gen6/globals"
 
 	nex_matchmake_extension_common "github.com/PretendoNetwork/pokemon-gen6/nex/matchmake-extension/common"
 )
-
-func generateNEXUniqueIDHandler() uint64 {
-	var uniqueID uint64
-
-	err := binary.Read(rand.Reader, binary.BigEndian, &uniqueID)
-	if err != nil {
-		globals.Logger.Error(err.Error())
-	}
-
-	return uniqueID
-}
 
 func registerCommonSecureServerProtocols() {
 	secureProtocol := secure.NewProtocol()
@@ -60,7 +48,7 @@ func registerCommonSecureServerProtocols() {
 	utilityProtocol := utility.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(utilityProtocol)
 	commonUtilityProtocol := common_utility.NewCommonProtocol(utilityProtocol)
-	commonUtilityProtocol.GenerateNEXUniqueID = generateNEXUniqueIDHandler
+	commonUtilityProtocol.GenerateNEXUniqueID = database_utility.GenerateNEXUniqueID
 
 	matchMakingProtocol := match_making.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(matchMakingProtocol)

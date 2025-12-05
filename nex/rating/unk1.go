@@ -19,8 +19,7 @@ func Unk1(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage
 
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 
-	types.UInt32(2259334670).WriteTo(rmcResponseStream)
-	types.UInt32(0).WriteTo(rmcResponseStream)
+	types.UInt64(2259334670).WriteTo(rmcResponseStream)
 	types.NewString("e00d70431ddca6ae").WriteTo(rmcResponseStream)
 
 	rmcResponseBody := rmcResponseStream.Bytes()
