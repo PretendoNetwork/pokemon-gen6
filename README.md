@@ -42,13 +42,16 @@ All configuration options are handled via environment variables
 
 `.env` files are supported
 
-| Name                                    | Description                                                                                                            | Required                                      |
-|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| Name                                     | Description                                                                                                             | Required                                      |
+|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
 | `PN_POKEGEN6_POSTGRES_URI`               | Fully qualified URI to your Postgres server (Example `postgres://username:password@localhost/pokegen6?sslmode=disable`) | Yes                                           |
-| `PN_POKEGEN6_KERBEROS_PASSWORD`          | Password used as part of the internal server data in Kerberos tickets                                                  | No (Default password `password` will be used) |
-| `PN_POKEGEN6_AUTHENTICATION_SERVER_PORT` | Port for the authentication server                                                                                     | Yes                                           |
-| `PN_POKEGEN6_SECURE_SERVER_HOST`         | Host name for the secure server (should point to the same address as the authentication server)                        | Yes                                           |
-| `PN_POKEGEN6_SECURE_SERVER_PORT`         | Port for the secure server                                                                                             | Yes                                           |
-| `PN_POKEGEN6_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                                         | Yes                                           |
-| `PN_POKEGEN6_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                                              | Yes                                           |
-| `PN_POKEGEN6_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                                           | No (Assumed to be an open gRPC API)           |
+| `PN_POKEGEN6_AUTHENTICATION_SERVER_PORT` | Port for the authentication server                                                                                      | Yes                                           |
+| `PN_POKEGEN6_SECURE_SERVER_HOST`         | Host name for the secure server (should point to the same address as the authentication server)                         | Yes                                           |
+| `PN_POKEGEN6_SECURE_SERVER_PORT`         | Port for the secure server                                                                                              | Yes                                           |
+| `PN_POKEGEN6_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                                          | Yes                                           |
+| `PN_POKEGEN6_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                                               | Yes                                           |
+| `PN_POKEGEN6_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                                            | No (Assumed to be an open gRPC API)              |
+| `PN_POKEGEN6_FRIENDS_GRPC_HOST`          | Host name for your friends server gRPC service                                                                          | Yes                                           |
+| `PN_POKEGEN6_FRIENDS_GRPC_PORT`          | Port for your friends server gRPC service                                                                               | Yes                                           |
+| `PN_POKEGEN6_FRIENDS_GRPC_API_KEY`       | API key for your friends server gRPC service                                                                            | No (Assumed to be an open gRPC API)              |
+| `PN_POKEGEN6_AES_KEY`                    | AES key for authentication token                                                                                        | Yes                                           |

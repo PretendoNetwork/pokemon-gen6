@@ -15,6 +15,7 @@ func registerCommonAuthenticationServerProtocols() {
 	ticketGrantingProtocol := ticket_granting.NewProtocol()
 	globals.AuthenticationEndpoint.RegisterServiceProtocol(ticketGrantingProtocol)
 	commonTicketGrantingProtocol := common_ticket_granting.NewCommonProtocol(ticketGrantingProtocol)
+	commonTicketGrantingProtocol.SetPretendoValidation(globals.TokenAESKey)
 
 	port, _ := strconv.Atoi(os.Getenv("PN_POKEGEN6_SECURE_SERVER_PORT"))
 
@@ -32,4 +33,3 @@ func registerCommonAuthenticationServerProtocols() {
 	commonTicketGrantingProtocol.BuildName = types.NewString(serverBuildString)
 	commonTicketGrantingProtocol.SecureServerAccount = globals.SecureServerAccount
 }
-

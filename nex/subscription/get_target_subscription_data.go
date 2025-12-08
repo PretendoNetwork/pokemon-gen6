@@ -1,10 +1,11 @@
 package nex_subscription
 
 import (
-	nex "github.com/PretendoNetwork/nex-go/v2"
+	"github.com/PretendoNetwork/nex-go/v2"
 	"github.com/PretendoNetwork/nex-go/v2/types"
-	"github.com/PretendoNetwork/pokemon-gen6/globals"
 	subscription "github.com/PretendoNetwork/nex-protocols-go/v2/subscription"
+	subscription_types "github.com/PretendoNetwork/nex-protocols-go/v2/subscription/types"
+	"github.com/PretendoNetwork/pokemon-gen6/globals"
 )
 
 func GetTargetSubscriptionData(err error, packet nex.PacketInterface, callID uint32) (*nex.RMCMessage, *nex.Error) {
@@ -19,7 +20,24 @@ func GetTargetSubscriptionData(err error, packet nex.PacketInterface, callID uin
 
 	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
 
-	types.UInt32(0).WriteTo(rmcResponseStream)
+	targetSubscriptionList := types.NewList[subscription_types.SubscriptionData]()
+
+	if len(globals.SubscriptionTargets.GetTargets(client.PID())) > 0 {
+		for _, target := range globals.SubscriptionTargets.GetTargets(client.PID()) {
+			if !globals.SubscriptionTimeline.HasData(target) {
+				continue
+			}
+
+			data, err := globals.SubscriptionTimeline.GetData(target)
+			if err != nil {
+				return nil, err
+			}
+
+			targetSubscriptionList = append(targetSubscriptionList, data.Data.Copy().(subscription_types.SubscriptionData))
+		}
+	}
+
+	targetSubscriptionList.WriteTo(rmcResponseStream)
 
 	rmcResponseBody := rmcResponseStream.Bytes()
 
@@ -30,4 +48,3 @@ func GetTargetSubscriptionData(err error, packet nex.PacketInterface, callID uin
 
 	return rmcResponse, nil
 }
-
