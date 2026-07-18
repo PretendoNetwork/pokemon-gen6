@@ -28,3 +28,4 @@ build
 log
 *.pem
 *.key
+.idea
