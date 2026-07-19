@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 
 
 # * Running the final application
-FROM alpine:3.20 AS final
+FROM alpine:3.22 AS final
 ARG app_dir
 WORKDIR ${app_dir}
 
